@@ -13,7 +13,12 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/grayscale.jpg "Grayscale"
+[image1]: ./writeup_images/grayscale.jpg "Grayscale"
+[image2]: ./writeup_images/gaussian_blur_image.jpg "GaussianBlur"
+[image3]: ./writeup_images/canny_edge_detection.jpg "CannyEdgeDetection"
+[image4]: ./writeup_images/region_of_interest.jpg "RegionOfInterest"
+[image5]: ./writeup_images/hough_lines.jpg "HoughLines"
+[image6]: ./writeup_images/final_output.jpg "FinalOutput"
 
 ---
 
@@ -23,20 +28,23 @@ The goals / steps of this project are the following:
 
 My pipeline consisted of 5 steps. 
 - First, I converted the images to grayscale
+![alt text][image1]
 - Then I defined a kernel of size 3 for Gaussian smoothing / blurring
+![alt text][image2]
 - This was followed by running Canny's edge detection algorithm with high and low thresholds determined using Otsu's method
+![alt text][image3]
+- Following this, I defined a region of interest which was a quadrilateral around the region of the lanes
+![alt text][image4]
 - Then I applied the Hough transform on the resulting image with a distance resolution of 1 pixel; an angular resolution of 2 degrees; with 90 as the minimum number of votes; 3 as the minimum number of pixels making a up a line; and 3 as the maximum gap in pixels between connectable line segments.
+![alt text][image5]
 - Finally, I created a weighted image from the output of the hough lines transform using the default parameters for α, β and γ.
+![alt text][image6]
 
 In order to draw a single line on the left and right lanes, I modified the draw_lines() function by separating the line segments returned by the Hough transform into two categories:
 - Lines that lie towards the left of the region of interest based on the fact that the slope of such lines is positive
 - Lines that lie towards the right of the region of interest based on the fact that the slope of such lines is negative
 In order to eliminate erroneous lines such as horizontal lines in the challenge video, I added an additional check to ensure that all lines that didn't lie within at most 10 degrees of the left or right edges of the region of interest were discarded.
-The draw_lines() method was then called separately for each category of lines. Within the draw_lines() method, I fitted a polynomial using np.polyfit to get a line of the form y = mx + b. After ensuring that this line lay within at most 10 degrees of the left or right edges of the region of interest, I constructed a line which extended from ((y - b) / m, y) where y is the height of the image till ((y' - b) / m, y'), where y' is half the height of the image.
-
-If you'd like to include images to show how the pipeline works, here is how to include an image: 
-
-![alt text][image1]
+The draw_lines() method was then called separately for each category of lines. Within the draw_lines() method, I fitted a polynomial using np.polyfit() to get a line of the form y = mx + b. After ensuring that this line lay within at most 10 degrees of the left or right edges of the region of interest, I constructed a line which extended from ((y - b) / m, y) where y is the height of the image till ((y' - b) / m, y'), where y' is approximately half the height of the image.
 
 
 ### 2. Identify potential shortcomings with your current pipeline
